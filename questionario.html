@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Questionário de acompanhamento · Observatório de Egressos PPGTIC (protótipo V2)</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 40 40%27%3E%3Crect width=%2740%27 height=%2740%27 rx=%278%27 fill=%27%23003893%27/%3E%3Ccircle cx=%2720%27 cy=%2720%27 r=%2712%27 fill=%27none%27 stroke=%27white%27 stroke-width=%273%27/%3E%3Ccircle cx=%2720%27 cy=%2720%27 r=%274%27 fill=%27%23FEE300%27/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <noscript><p style="padding:16px;background:#FFF6B8">Este protótipo precisa de JavaScript habilitado.</p></noscript>
+
+  <main id="conteudo" class="container">
+    <div class="cab-pagina">
+      <div>
+        <h1 class="titulo-pagina" id="titulo-q">Questionário de acompanhamento</h1>
+        <p class="lead" id="lead-q">Leva cerca de 8 minutos. As respostas confirmadas aqui atualizam seu cadastro.</p>
+      </div>
+    </div>
+
+    <div id="estado"></div>
+
+    <form id="form-q" novalidate hidden>
+      <div class="cartao">
+        <ol class="etapas" id="etapas" aria-label="Etapas do questionário"></ol>
+        <div class="progresso" style="margin-top:12px">
+          <span id="progresso-q">Perfis on-line</span>
+          <div class="progresso-trilho" aria-hidden="true"><div class="progresso-barra" id="barra-q" style="width:0%"></div></div>
+          <span class="texto-apoio" id="tempo-q"></span>
+        </div>
+      </div>
+
+      <div id="resumo-erros" class="caixa-info vermelha mb" role="alert" hidden></div>
+
+      <!-- Etapa inicial: perfis on-line (obrigatória: LinkedIn, currículo Lattes ou os dois) -->
+      <section class="cartao bloco" data-bloco="0" aria-labelledby="b0-titulo">
+        <h2 id="b0-titulo">Seus perfis on-line</h2>
+        <p class="texto-apoio">Informe o link do seu LinkedIn, do seu currículo Lattes ou dos dois. <strong>Pelo menos um é obrigatório</strong>: a coordenação usa esses perfis públicos para acompanhar sua trajetória.</p>
+        <fieldset class="pergunta" id="grupo-perfis" data-rotulo="Perfis on-line">
+          <legend class="sr">Link do LinkedIn ou do currículo Lattes (pelo menos um)</legend>
+          <div class="campos">
+            <div class="campo-grupo inteiro">
+              <label class="rotulo" for="q-linkedin">Link do LinkedIn</label>
+              <input class="campo" id="q-linkedin" type="url" inputmode="url" autocomplete="url" placeholder="https://www.linkedin.com/in/seu-perfil" data-rotulo="LinkedIn" aria-describedby="ajuda-q-linkedin">
+              <div class="msg-ajuda" id="ajuda-q-linkedin">Abra seu perfil no LinkedIn e copie o endereço da página.</div>
+            </div>
+            <div class="campo-grupo inteiro">
+              <label class="rotulo" for="q-lattes">Link do currículo Lattes</label>
+              <input class="campo" id="q-lattes" type="url" inputmode="url" placeholder="http://lattes.cnpq.br/0000000000000000" data-rotulo="Currículo Lattes" aria-describedby="ajuda-q-lattes">
+              <div class="msg-ajuda" id="ajuda-q-lattes">Copie o "Endereço para acessar este CV", no alto do currículo: lattes.cnpq.br/ seguido de 16 números.</div>
+            </div>
+          </div>
+        </fieldset>
+      </section>
+
+      <!-- Bloco 1 -->
+      <section class="cartao bloco" data-bloco="1" aria-labelledby="b1-titulo" hidden>
+        <h2 id="b1-titulo">1. Inserção, permanência e mobilidade</h2>
+        <div class="caixa-info mb" id="vinculo-atual" style="margin-top:0"></div>
+
+        <fieldset class="pergunta" id="grupo-mesmoVinculo" data-rotulo="Vínculo atual">
+          <legend>Seu vínculo atual continua o mesmo?<span class="obrig">*</span></legend>
+          <div class="opcoes-linha">
+            <label class="checagem"><input type="radio" name="mesmoVinculo" value="sim"> Sim, continua o mesmo</label>
+            <label class="checagem"><input type="radio" name="mesmoVinculo" value="mudou"> Não, mudou</label>
+            <label class="checagem"><input type="radio" name="mesmoVinculo" value="sem"> Estou sem vínculo no momento</label>
+          </div>
+        </fieldset>
+
+        <div id="novo-vinculo" class="pergunta" hidden>
+          <p class="rotulo-pergunta">Novo vínculo</p>
+          <div class="campos">
+            <div class="campo-grupo">
+              <label class="rotulo" for="nv-instituicao">Nova instituição ou empresa<span class="obrig">*</span></label>
+              <input class="campo" id="nv-instituicao" data-nv data-rotulo="Nova instituição">
+            </div>
+            <div class="campo-grupo">
+              <label class="rotulo" for="nv-cargo">Cargo ou função<span class="obrig">*</span></label>
+              <input class="campo" id="nv-cargo" data-nv data-rotulo="Novo cargo">
+            </div>
+            <div class="campo-grupo">
+              <label class="rotulo" for="nv-setor">Setor<span class="obrig">*</span></label>
+              <select class="campo" id="nv-setor" data-nv data-rotulo="Novo setor"></select>
+            </div>
+            <div class="campo-grupo">
+              <label class="rotulo" for="nv-natureza">Natureza<span class="obrig">*</span></label>
+              <select class="campo" id="nv-natureza" data-nv data-rotulo="Nova natureza">
+                <option value="">Selecione</option><option>Pública</option><option>Privada</option>
+              </select>
+            </div>
+            <div class="campo-grupo">
+              <label class="rotulo" for="nv-inicio">Início no vínculo<span class="obrig">*</span></label>
+              <input class="campo" id="nv-inicio" placeholder="MM/AAAA" inputmode="numeric" maxlength="7" data-nv data-mes data-rotulo="Início do novo vínculo">
+            </div>
+            <div class="campo-grupo">
+              <label class="rotulo" for="nv-cidade">Cidade / UF<span class="obrig">*</span></label>
+              <div class="campo-com-botao">
+                <input class="campo" id="nv-cidade" data-nv data-rotulo="Nova cidade">
+                <select class="campo" id="nv-uf" data-nv data-rotulo="Nova UF" style="max-width:110px" aria-label="UF"></select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <fieldset class="pergunta" id="grupo-mudancas" data-rotulo="Mudanças desde a titulação">
+          <legend>O que mudou desde a titulação?<span class="obrig">*</span> <span class="opcional">(marque todas as opções que se aplicam)</span></legend>
+          <div class="opcoes-linha" id="opcoes-mudancas"></div>
+        </fieldset>
+
+        <fieldset class="pergunta" id="grupo-progressao" data-rotulo="Progressão na carreira">
+          <legend>Teve progressão na carreira desde a titulação (promoção, novo nível ou enquadramento)?<span class="obrig">*</span></legend>
+          <div class="opcoes-linha">
+            <label class="checagem"><input type="radio" name="progressao" value="sim"> Sim</label>
+            <label class="checagem"><input type="radio" name="progressao" value="nao"> Não</label>
+          </div>
+        </fieldset>
+
+        <div class="campos">
+          <div class="campo-grupo">
+            <label class="rotulo" for="q-posGrad">Ingressou em doutorado ou pós-doutorado?<span class="obrig">*</span></label>
+            <select class="campo" id="q-posGrad" data-rotulo="Doutorado ou pós-doutorado"></select>
+          </div>
+          <div class="campo-grupo" id="grupo-anoPos" hidden>
+            <label class="rotulo" for="q-anoPos">Ano de ingresso</label>
+            <select class="campo" id="q-anoPos"></select>
+          </div>
+          <div class="campo-grupo">
+            <label class="rotulo" for="q-docente">Atua como docente?<span class="obrig">*</span></label>
+            <select class="campo" id="q-docente" data-rotulo="Docência"></select>
+          </div>
+          <div class="campo-grupo">
+            <label class="rotulo" for="q-atuaPPG">Atua em programa de pós-graduação?<span class="obrig">*</span></label>
+            <select class="campo" id="q-atuaPPG" data-rotulo="Atuação em PPG">
+              <option value="">Selecione</option><option value="nao">Não</option><option value="sim">Sim</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bloco 2 -->
+      <section class="cartao bloco" data-bloco="2" aria-labelledby="b2-titulo" hidden>
+        <h2 id="b2-titulo">2. Relação com a formação</h2>
+        <fieldset class="pergunta" id="grupo-relacao" data-rotulo="Relação com a formação">
+          <legend>Sua atuação atual tem relação com a formação no PPGTIC?<span class="obrig">*</span></legend>
+          <div class="escala">
+            <label><input type="radio" name="relacao" value="1"><span>1</span></label>
+            <label><input type="radio" name="relacao" value="2"><span>2</span></label>
+            <label><input type="radio" name="relacao" value="3"><span>3</span></label>
+            <label><input type="radio" name="relacao" value="4"><span>4</span></label>
+            <label><input type="radio" name="relacao" value="5"><span>5</span></label>
+          </div>
+          <div class="escala-rotulos"><span>1 = nenhuma relação</span><span>5 = relação total</span></div>
+        </fieldset>
+        <div class="pergunta" id="grupo-importancia" data-rotulo="Importância da formação">
+          <p class="rotulo-pergunta">Quanto a formação no PPGTIC foi importante para:<span class="obrig">*</span></p>
+          <div class="tabela-rolagem"><table class="tabela tabela-importancia" id="tabela-importancia"></table></div>
+        </div>
+      </section>
+
+      <!-- Bloco 3 -->
+      <section class="cartao bloco" data-bloco="3" aria-labelledby="b3-titulo" hidden>
+        <h2 id="b3-titulo">3. Impactos e produção intelectual</h2>
+        <div class="pergunta" id="grupo-producoes" data-rotulo="Produções">
+          <div class="cartao-cab" style="margin-bottom:6px">
+            <p class="rotulo-pergunta" style="margin:0">Publicações e produtos técnicos desde a titulação</p>
+            <button type="button" class="btn btn-secundario" id="btn-importar-orcid">Importar do ORCID</button>
+          </div>
+          <div id="lista-producoes"></div>
+          <div class="campos" style="margin-top:10px">
+            <div class="campo-grupo">
+              <label class="rotulo" for="p-tipo">Tipo</label>
+              <select class="campo" id="p-tipo"></select>
+            </div>
+            <div class="campo-grupo largo">
+              <label class="rotulo" for="p-titulo">Título</label>
+              <input class="campo" id="p-titulo" data-rotulo="Título da produção">
+            </div>
+            <div class="campo-grupo" style="grid-column: span 1">
+              <label class="rotulo" for="p-ano">Ano</label>
+              <select class="campo" id="p-ano"></select>
+            </div>
+            <div class="campo-grupo largo">
+              <label class="rotulo" for="p-link">Link ou DOI <span class="opcional">(opcional)</span></label>
+              <input class="campo" id="p-link" placeholder="https://doi.org/10..." data-rotulo="Link da produção">
+            </div>
+            <div class="campo-grupo" style="align-self:end">
+              <button type="button" class="btn btn-secundario btn-bloco" id="btn-add-producao">Adicionar</button>
+            </div>
+          </div>
+          <label class="checagem" style="margin-top:8px"><input type="checkbox" id="semProducao"> Não tenho publicações ou produtos a registrar desde a titulação</label>
+        </div>
+        <fieldset class="pergunta">
+          <legend>Que tipos de impacto sua atuação gerou?</legend>
+          <div class="opcoes-linha" id="opcoes-impactos"></div>
+        </fieldset>
+        <div class="pergunta">
+          <label class="rotulo rotulo-pergunta" for="impactosTexto">Descreva os impactos acadêmicos, sociais, econômicos ou profissionais <span class="opcional">(até 150 palavras)</span></label>
+          <textarea class="campo" id="impactosTexto" data-rotulo="Descrição dos impactos"></textarea>
+          <div class="contador" id="contador-impactos" aria-live="polite">0 de 150 palavras</div>
+        </div>
+        <div class="pergunta">
+          <label class="rotulo rotulo-pergunta" for="premios">Prêmios ou reconhecimentos <span class="opcional">(opcional)</span></label>
+          <textarea class="campo" id="premios" style="min-height:60px"></textarea>
+        </div>
+      </section>
+
+      <!-- Bloco 4 -->
+      <section class="cartao bloco" data-bloco="4" aria-labelledby="b4-titulo" hidden>
+        <h2 id="b4-titulo">4. Avaliação do programa</h2>
+        <p class="texto-apoio">As respostas deste bloco alimentam a autoavaliação do PPGTIC (dimensão D5). Todas são opcionais.</p>
+        <div class="campos">
+          <div class="campo-grupo inteiro">
+            <label class="rotulo" for="manter">O que o PPGTIC deveria manter?</label>
+            <textarea class="campo" id="manter" style="min-height:60px"></textarea>
+          </div>
+          <div class="campo-grupo inteiro">
+            <label class="rotulo" for="mudar">O que deveria mudar?</label>
+            <textarea class="campo" id="mudar" style="min-height:60px"></textarea>
+          </div>
+          <div class="campo-grupo inteiro">
+            <label class="rotulo" for="incluir">O que deveria incluir?</label>
+            <textarea class="campo" id="incluir" style="min-height:60px"></textarea>
+          </div>
+        </div>
+        <fieldset class="pergunta" style="margin-top:16px">
+          <legend>Você teria disponibilidade para:</legend>
+          <div class="opcoes-linha" id="opcoes-disponibilidade"></div>
+        </fieldset>
+      </section>
+
+      <div class="acoes">
+        <button type="button" class="btn btn-secundario" id="btn-voltar">Voltar</button>
+        <button type="submit" class="btn btn-primario" id="btn-avancar">Continuar</button>
+        <span class="espaco"></span>
+        <button type="button" class="btn btn-texto" id="btn-depois">Salvar e continuar depois</button>
+      </div>
+    </form>
+
+    <div id="concluido" hidden></div>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/base.js"></script>
+  <script src="js/dados-ficticios.js"></script>
+  <script src="js/repositorio.js"></script>
+  <script src="js/indicadores.js"></script>
+  <script src="js/coleta.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/tela-questionario.js"></script>
+</body>
+</html>

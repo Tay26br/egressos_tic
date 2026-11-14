@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Painel de indicadores · Observatório de Egressos PPGTIC (protótipo V2)</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 40 40%27%3E%3Crect width=%2740%27 height=%2740%27 rx=%278%27 fill=%27%23003893%27/%3E%3Ccircle cx=%2720%27 cy=%2720%27 r=%2712%27 fill=%27none%27 stroke=%27white%27 stroke-width=%273%27/%3E%3Ccircle cx=%2720%27 cy=%2720%27 r=%274%27 fill=%27%23FEE300%27/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <noscript><p style="padding:16px;background:#FFF6B8">Este protótipo precisa de JavaScript habilitado.</p></noscript>
+
+  <main id="conteudo" class="container">
+    <div class="so-impressao cabecalho-impressao">
+      <strong>Relatório de egressos · Observatório de Egressos PPGTIC/UFSC</strong><br>
+      <span id="impressao-data"></span> · Protótipo V2 · Todos os dados são fictícios.
+    </div>
+
+    <div class="cab-pagina">
+      <div>
+        <h1 class="titulo-pagina">Painel de indicadores</h1>
+        <p class="lead" id="lead-painel"></p>
+      </div>
+    </div>
+
+    <div class="cartao filtros nao-imprimir" id="filtros">
+      <div>
+        <label class="rotulo" for="f-faixa">Faixa de titulação</label>
+        <select class="campo" id="f-faixa">
+          <option value="todas">Todas as faixas</option>
+          <option>2024–2028</option>
+          <option>2019–2023</option>
+          <option>2014–2018</option>
+        </select>
+      </div>
+      <div id="grupo-origem">
+        <label class="rotulo" for="f-origem">Origem dos registros</label>
+        <select class="campo" id="f-origem">
+          <option value="todas">Todos os registros</option>
+          <option value="base">Somente base fictícia</option>
+          <option value="teste">Somente registros de teste</option>
+          <option value="coleta">Somente respostas da planilha</option>
+        </select>
+      </div>
+      <div id="grupo-visao">
+        <label class="rotulo" for="f-visao">Visão</label>
+        <select class="campo" id="f-visao">
+          <option value="restrita">Restrita (dados individuais)</option>
+          <option value="publica">Pública (página Dados)</option>
+        </select>
+      </div>
+      <span class="texto-apoio" id="contagem-registros" style="margin-left:auto"></span>
+    </div>
+
+    <div id="painel"></div>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/base.js"></script>
+  <script src="js/dados-ficticios.js"></script>
+  <script src="js/repositorio.js"></script>
+  <script src="js/indicadores.js"></script>
+  <script src="js/coleta.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/tela-indicadores.js"></script>
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cadastro do egresso · Observatório de Egressos PPGTIC (protótipo V2)</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 40 40%27%3E%3Crect width=%2740%27 height=%2740%27 rx=%278%27 fill=%27%23003893%27/%3E%3Ccircle cx=%2720%27 cy=%2720%27 r=%2712%27 fill=%27none%27 stroke=%27white%27 stroke-width=%273%27/%3E%3Ccircle cx=%2720%27 cy=%2720%27 r=%274%27 fill=%27%23FEE300%27/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <noscript><p style="padding:16px;background:#FFF6B8">Este protótipo precisa de JavaScript habilitado.</p></noscript>
+
+  <main id="conteudo" class="container">
+    <div class="cab-pagina">
+      <div>
+        <h1 class="titulo-pagina" id="titulo-cadastro">Cadastro do egresso</h1>
+        <p class="lead">Preencha na defesa ou a qualquer momento depois dela. Seus dados ajudam o PPGTIC a acompanhar a trajetória de quem se formou aqui e a melhorar o programa.</p>
+      </div>
+    </div>
+
+    <div id="contexto"></div>
+    <div id="sucesso" hidden></div>
+
+    <form id="form-cadastro" novalidate>
+      <div id="resumo-erros" class="caixa-info vermelha mb" role="alert" hidden></div>
+
+      <div class="cartao">
+        <div class="progresso">
+          <span id="progresso-texto">Campos obrigatórios preenchidos: 0 de 0</span>
+          <div class="progresso-trilho" aria-hidden="true"><div class="progresso-barra" id="progresso-barra" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <!-- 1. Identificação -->
+      <section class="cartao" aria-labelledby="sec-identificacao">
+        <h2 id="sec-identificacao">Identificação</h2>
+        <div class="campos">
+          <div class="campo-grupo">
+            <label class="rotulo" for="nome">Nome completo<span class="obrig">*</span></label>
+            <input class="campo" id="nome" name="nome" autocomplete="name" data-obrigatorio data-rotulo="Nome completo">
+          </div>
+          <div class="campo-grupo">
+            <label class="rotulo" for="email">E-mail pessoal<span class="obrig">*</span></label>
+            <input class="campo" id="email" name="email" type="email" autocomplete="email" data-obrigatorio data-rotulo="E-mail pessoal" aria-describedby="ajuda-email">
+            <div class="msg-ajuda" id="ajuda-email">Não use o e-mail da UFSC: ele é desativado após a titulação.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Formação no PPGTIC -->
+      <section class="cartao" aria-labelledby="sec-formacao">
+        <h2 id="sec-formacao">Formação no PPGTIC</h2>
+        <div id="aviso-secretaria"></div>
+        <div class="campos">
+          <div class="campo-grupo">
+            <label class="rotulo" for="nivel">Nível<span class="obrig">*</span></label>
+            <select class="campo" id="nivel" name="nivel" data-obrigatorio data-rotulo="Nível" data-formacao>
+              <option value="">Selecione</option>
+              <option value="ME">Mestrado</option>
+              <option value="DO">Doutorado</option>
+            </select>
+          </div>
+          <div class="campo-grupo">
+            <label class="rotulo" for="anoDefesa">Ano da defesa<span class="obrig">*</span></label>
+            <select class="campo" id="anoDefesa" name="anoDefesa" data-obrigatorio data-rotulo="Ano da defesa" data-formacao></select>
+          </div>
+          <div class="campo-grupo">
+            <label class="rotulo" for="linha">Linha de pesquisa<span class="obrig">*</span></label>
+            <select class="campo" id="linha" name="linha" data-obrigatorio data-rotulo="Linha de pesquisa" data-formacao></select>
+          </div>
+          <div class="campo-grupo largo">
+            <label class="rotulo" for="titulo">Título do trabalho de conclusão<span class="obrig">*</span></label>
+            <input class="campo" id="titulo" name="titulo" data-obrigatorio data-rotulo="Título do trabalho" data-formacao>
+          </div>
+          <div class="campo-grupo largo">
+            <label class="rotulo" for="orientador">Orientador(a)<span class="obrig">*</span></label>
+            <select class="campo" id="orientador" name="orientador" data-obrigatorio data-rotulo="Orientador(a)" data-formacao></select>
+          </div>
+        </div>
+        <div class="caixa-info" id="info-faixa">
+          <svg class="icone" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <span id="texto-faixa">Informe o ano da defesa para calcular a faixa de titulação.</span>
+        </div>
+      </section>
+
+      <!-- 3. Situação profissional atual -->
+      <section class="cartao" aria-labelledby="sec-situacao">
+        <h2 id="sec-situacao">Situação profissional atual</h2>
+        <label class="checagem mb"><input type="checkbox" id="semVinculo" name="semVinculo"> Estou sem vínculo profissional no momento</label>
+        <div class="campos">
+          <div class="campo-grupo">
+            <label class="rotulo" for="instituicao">Instituição ou empresa<span class="obrig">*</span></label>
+            <input class="campo" id="instituicao" name="instituicao" data-obrigatorio data-vinculo data-rotulo="Instituição">
+          </div>
+          <div class="campo-grupo">
+            <label class="rotulo" for="cargo">Cargo ou função<span class="obrig">*</span></label>
+            <input class="campo" id="cargo" name="cargo" data-obrigatorio data-vinculo data-rotulo="Cargo ou função">
+          </div>
+          <div class="campo-grupo">
+            <label class="rotulo" for="setor">Setor<span class="obrig">*</span></label>
+            <select class="campo" id="setor" name="setor" data-obrigatorio data-vinculo data-rotulo="Setor"></select>
+          </div>
+          <div class="campo-grupo">
+            <label class="rotulo" for="natureza">Natureza do vínculo<span class="obrig">*</span></label>
+            <select class="campo" id="natureza" name="natureza" data-obrigatorio data-vinculo data-rotulo="Natureza do vínculo">
+              <option value="">Selecione</option>
+              <option>Pública</option>
+              <option>Privada</option>
+            </select>
+          </div>
+          <div class="campo-grupo">
+            <label class="rotulo" for="inicioVinculo">Início no vínculo<span class="obrig">*</span></label>
+            <input class="campo" id="inicioVinculo" name="inicioVinculo" inputmode="numeric" placeholder="MM/AAAA" maxlength="7" data-obrigatorio data-vinculo data-mes data-rotulo="Início no vínculo">
+          </div>
+          <div class="campo-grupo">
+            <label class="rotulo" for="cidade">Cidade<span class="obrig">*</span></label>
+            <input class="campo" id="cidade" name="cidade" autocomplete="address-level2" data-obrigatorio data-rotulo="Cidade">
+          </div>
+          <div class="campo-grupo">
+            <label class="rotulo" for="uf">UF<span class="obrig">*</span></label>
+            <select class="campo" id="uf" name="uf" data-obrigatorio data-rotulo="UF"></select>
+          </div>
+          <div class="campo-grupo">
+            <label class="rotulo" for="pais">País<span class="obrig">*</span></label>
+            <input class="campo" id="pais" name="pais" value="Brasil" autocomplete="country-name" data-obrigatorio data-rotulo="País">
+          </div>
+        </div>
+
+        <h3 class="subtitulo-modal">Informações complementares <span class="opcional">(opcionais)</span></h3>
+        <div class="campos">
+          <div class="campo-grupo">
+            <label class="rotulo" for="vinculoIngresso">Vínculo na época do ingresso no PPGTIC</label>
+            <input class="campo" id="vinculoIngresso" name="vinculoIngresso" placeholder="Ex.: professor da rede estadual">
+            <div class="msg-ajuda">Usado para medir a mobilidade.</div>
+          </div>
+          <div class="campo-grupo">
+            <label class="rotulo" for="posGrad">Doutorado ou pós-doutorado</label>
+            <select class="campo" id="posGrad" name="posGrad"></select>
+          </div>
+          <div class="campo-grupo">
+            <label class="rotulo" for="atuaPPG">Atua em programa de pós-graduação?</label>
+            <select class="campo" id="atuaPPG" name="atuaPPG">
+              <option value="nao">Não</option>
+              <option value="sim">Sim, como docente permanente ou colaborador</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Identificadores acadêmicos -->
+      <section class="cartao" aria-labelledby="sec-ids">
+        <h2 id="sec-ids">Identificadores acadêmicos</h2>
+        <div class="campos">
+          <div class="campo-grupo largo">
+            <label class="rotulo" for="orcid">ORCID <span class="opcional">(opcional)</span></label>
+            <div class="campo-com-botao">
+              <input class="campo" id="orcid" name="orcid" placeholder="0000-0000-0000-0000" maxlength="19" data-rotulo="ORCID">
+              <button type="button" class="btn btn-secundario" id="btn-orcid">Conectar ORCID</button>
+            </div>
+            <div class="msg-ajuda" id="ajuda-orcid">Conectar pelo login no ORCID confirma o identificador e permite atualizar vínculos e produções.</div>
+          </div>
+          <div class="campo-grupo largo">
+            <label class="rotulo" for="lattesId">ID Lattes <span class="opcional">(opcional)</span></label>
+            <input class="campo" id="lattesId" name="lattesId" inputmode="numeric" maxlength="16" placeholder="16 dígitos" data-rotulo="ID Lattes">
+            <div class="msg-ajuda">O ID aparece no endereço do currículo: lattes.cnpq.br/<em>número</em>.</div>
+          </div>
+          <div class="campo-grupo largo">
+            <label class="rotulo" for="lattesAtualizadoEm">Última atualização do seu Lattes <span class="opcional">(opcional)</span></label>
+            <input class="campo" id="lattesAtualizadoEm" name="lattesAtualizadoEm" inputmode="numeric" placeholder="MM/AAAA" maxlength="7" data-mes data-rotulo="Atualização do Lattes">
+            <div class="msg-ajuda">A Secretaria confere essa data no currículo. Lattes atualizado nos últimos 12 meses é um dos critérios de dados mínimos.</div>
+          </div>
+          <div class="campo-grupo largo">
+            <label class="rotulo" for="linkedin">LinkedIn <span class="opcional">(opcional)</span></label>
+            <input class="campo" id="linkedin" name="linkedin" type="url" placeholder="https://www.linkedin.com/in/..." data-rotulo="LinkedIn">
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Consentimentos (LGPD) -->
+      <section class="cartao" aria-labelledby="sec-consent">
+        <h2 id="sec-consent">Consentimentos</h2>
+        <label class="checagem"><input type="checkbox" id="consentAcompanhamento" name="consentAcompanhamento">
+          Autorizo o acompanhamento da minha trajetória por questionários e a consulta aos meus registros públicos no ORCID, no Lattes e no LinkedIn.</label>
+        <label class="checagem"><input type="checkbox" id="consentDivulgacao" name="consentDivulgacao">
+          Autorizo a divulgação da minha trajetória na página Trajetórias PPGTIC, caso eu seja indicado como destaque.</label>
+        <div class="caixa-info" id="info-termo">
+          <svg class="icone" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <span id="texto-termo">As duas autorizações são independentes e podem ser revisadas ou revogadas a qualquer momento nesta página.</span>
+        </div>
+        <p class="texto-apoio pequeno" style="margin-top:12px">Os dados exigidos pela CAPES no Anexo 2 são tratados por cumprimento de obrigação legal e execução de políticas públicas (LGPD, art. 7º, II e III). O portal não coleta CPF: a Secretaria já o possui nos registros acadêmicos.</p>
+      </section>
+
+      <div class="acoes">
+        <button type="submit" class="btn btn-primario" id="btn-salvar">Salvar cadastro</button>
+        <span class="texto-apoio"><span class="obrig">*</span> campo obrigatório</span>
+        <span class="espaco"></span>
+        <button type="button" class="btn btn-texto" id="btn-exclusao">Solicitar exclusão dos meus dados</button>
+      </div>
+    </form>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/base.js"></script>
+  <script src="js/dados-ficticios.js"></script>
+  <script src="js/repositorio.js"></script>
+  <script src="js/indicadores.js"></script>
+  <script src="js/coleta.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/tela-cadastro.js"></script>
+</body>
+</html>
