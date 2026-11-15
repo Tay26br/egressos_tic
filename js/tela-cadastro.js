@@ -98,7 +98,32 @@
     opcoes($('uf'), R.ufs, 'Selecione');
     opcoes($('posGrad'), R.posGrad.map((p) => ({ v: p, t: p })));
   }
+  // No modo coleta (site oficial), o egresso escreve o nome do(a) orientador(a);
+  // na demonstração, a lista fictícia (A a P) continua, porque a base e o painel dependem dela.
+  function campoOrientadorLivre() {
+    if (!COLETA) return;
+    const lista = $('orientador');
+    const campo = document.createElement('input');
+    campo.className = 'campo';
+    campo.id = 'orientador';
+    campo.name = 'orientador';
+    campo.type = 'text';
+    campo.autocomplete = 'off';
+    campo.maxLength = 120;
+    campo.placeholder = 'Nome e sobrenome do(a) professor(a)';
+    campo.setAttribute('data-obrigatorio', '');
+    campo.setAttribute('data-rotulo', 'Orientador(a)');
+    campo.setAttribute('data-formacao', '');
+    campo.setAttribute('aria-describedby', 'ajuda-orientador');
+    lista.replaceWith(campo);
+    const ajuda = document.createElement('div');
+    ajuda.className = 'msg-ajuda';
+    ajuda.id = 'ajuda-orientador';
+    ajuda.textContent = 'Escreva o nome do(a) professor(a) que orientou seu trabalho de conclusão.';
+    campo.insertAdjacentElement('afterend', ajuda);
+  }
   function filtrarOrientadores() {
+    if (COLETA) return;
     const linha = val('linha');
     const atual = val('orientador');
     const lista = R.orientadores.filter((o) => !linha || o.linha === linha);
@@ -270,7 +295,8 @@
       // sem a conexão simulada: o egresso digita o identificador, conferido pelo dígito verificador
       $('btn-orcid').hidden = true;
       $('orcid').readOnly = false;
-      ajuda.textContent = v && U.orcidValido(v) ? 'Identificador válido.' : 'Se tiver ORCID, informe os 16 caracteres (0000-0000-0000-0000).';
+      if (v && U.orcidValido(v)) ajuda.textContent = 'Número válido.';
+      else ajuda.innerHTML = '<strong>Cole somente os números, não o link.</strong> Exemplo: no link https://orcid.org/<strong>0000-0002-1825-0097</strong>, cole só <strong>0000-0002-1825-0097</strong> (16 caracteres; o último pode ser X).';
       return;
     }
     if (orcidVerificado && v) {
@@ -280,9 +306,8 @@
     } else {
       $('orcid').readOnly = false;
       $('btn-orcid').textContent = 'Conectar ORCID';
-      ajuda.textContent = v && U.orcidValido(v)
-        ? 'Identificador válido, mas não verificado. Use "Conectar ORCID" para confirmar que é seu.'
-        : 'Conectar pelo login no ORCID confirma o identificador e permite atualizar vínculos e produções.';
+      if (v && U.orcidValido(v)) ajuda.textContent = 'Número válido, mas não verificado. Use "Conectar ORCID" para confirmar que é seu.';
+      else ajuda.innerHTML = '<strong>Cole somente os números, não o link.</strong> Exemplo: no link https://orcid.org/<strong>0000-0002-1825-0097</strong>, cole só <strong>0000-0002-1825-0097</strong> (16 caracteres; o último pode ser X). Ou use "Conectar ORCID", que confirma o número pelo login (simulação).';
     }
   }
   function camposObrigatorios() {
@@ -326,13 +351,14 @@
     }
     if (val('uf') === 'Exterior' && /^brasil$/i.test(val('pais'))) erro('pais', 'Informe o país em que você está.');
     if (val('uf') && val('uf') !== 'Exterior' && val('pais') && !/^brasil$/i.test(val('pais'))) erro('uf', 'Para endereço fora do Brasil, selecione "Exterior".');
-    if (val('orcid') && !U.orcidValido(val('orcid'))) erro('orcid', 'ORCID inválido: confira os 16 dígitos (o último pode ser X).');
-    if (val('lattesId') && !U.lattesValido(val('lattesId'))) erro('lattesId', 'O ID Lattes tem 16 dígitos numéricos.');
+    if (COLETA && val('orientador') && (val('orientador').length < 5 || val('orientador').split(/\s+/).length < 2)) erro('orientador', 'Escreva o nome e o sobrenome do(a) orientador(a).');
+    if (val('orcid') && !U.orcidValido(val('orcid'))) erro('orcid', 'Número do ORCID inválido: cole somente os 16 caracteres do número (o último pode ser X), sem o link.');
+    if (val('lattesId') && !U.lattesValido(val('lattesId'))) erro('lattesId', 'Cole somente os 16 números do final do link do currículo (lattes.cnpq.br/…).');
     if (val('lattesAtualizadoEm')) {
       const m = textoParaMes(val('lattesAtualizadoEm'));
       if (!m) erro('lattesAtualizadoEm', 'Use o formato MM/AAAA.');
       else if (U.parse(m) > U.hoje()) erro('lattesAtualizadoEm', 'A data não pode estar no futuro.');
-      else if (!val('lattesId')) erro('lattesId', 'Informe o ID Lattes para que a Secretaria possa conferir a data.');
+      else if (!val('lattesId')) erro('lattesId', 'Informe o número do currículo Lattes para que a Secretaria possa conferir a data.');
     }
     if (val('linkedin') && !/^https?:\/\/\S+\.\S+/.test(val('linkedin'))) erro('linkedin', 'Informe o endereço completo, começando com https://');
     // mesma ordem em que os campos aparecem na tela
@@ -581,12 +607,19 @@
         el.value = d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
       }
       if (el.id === 'orcid') {
-        const d = el.value.toUpperCase().replace(/[^0-9X]/g, '').slice(0, 16);
+        // se colarem o link inteiro (https://orcid.org/...), fica só o número
+        const bruto = el.value.toUpperCase();
+        const m = /(\d{4})-?(\d{4})-?(\d{4})-?(\d{3}[\dX])/.exec(bruto);
+        const d = m ? m.slice(1).join('') : bruto.replace(/[^0-9X]/g, '').slice(0, 16);
         el.value = d.replace(/(.{4})(?=.)/g, '$1-');
         orcidVerificado = false;
         aplicarOrcid();
       }
-      if (el.id === 'lattesId') el.value = el.value.replace(/\D/g, '').slice(0, 16);
+      if (el.id === 'lattesId') {
+        // se colarem o link inteiro (http://lattes.cnpq.br/...), ficam só os 16 números
+        const m = /\d{16}/.exec(el.value.replace(/\s/g, ''));
+        el.value = m ? m[0] : el.value.replace(/\D/g, '').slice(0, 16);
+      }
       if (el.classList.contains('invalido')) limparErro(el);
       atualizarProgresso();
     });
@@ -702,6 +735,7 @@
     $('btn-exclusao').textContent = 'Corrigir ou excluir meus dados';
   }
 
+  campoOrientadorLivre();
   montarSelects();
   ajustarTextosColeta();
   ligarEventos();
